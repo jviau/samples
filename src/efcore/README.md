@@ -2,7 +2,7 @@
 
 ## Cosmos
 
-Adds support for string method translation in queries. Enable this as follows:
+Adds support for string method translation in queries. Copy the code from [here](EFCore.Cosmos.Extensions/src) and then enable this as follows:
 
 ``` CSharp
 
