@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Cosmos.Query.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Microsoft.EntityFrameworkCore.Cosmos
 {
@@ -9,16 +10,15 @@ namespace Microsoft.EntityFrameworkCore.Cosmos
     /// </summary>
     public class CosmosMethodCallTranslatorPlugin : IMethodCallTranslatorPlugin
     {
-        private readonly ISqlExpressionFactory _sqlExpressionFactory;
-
         /// <summary>
         /// Initializes a new instance of <see cref="CosmosMethodCallTranslatorPlugin" />
         /// </summary>
         /// <param name="sqlExpressionFactory">The sql expression factory.</param>
-        public CosmosMethodCallTranslatorPlugin(ISqlExpressionFactory sqlExpressionFactory)
+        /// <param name="typeMappingSource">The type mapping source.</param>
+        public CosmosMethodCallTranslatorPlugin(
+            ISqlExpressionFactory sqlExpressionFactory, ITypeMappingSource typeMappingSource)
         {
-            _sqlExpressionFactory = sqlExpressionFactory ?? throw new ArgumentNullException(nameof(sqlExpressionFactory));
-            Translators = new[] { new CosmosStringMethodCallTranslator(_sqlExpressionFactory) };
+            Translators = new[] { new CosmosStringMethodCallTranslator(sqlExpressionFactory, typeMappingSource) };
         }
 
         /// <inheritdoc />

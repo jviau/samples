@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Cosmos.Query.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Microsoft.EntityFrameworkCore.Cosmos
 {
@@ -46,14 +47,18 @@ namespace Microsoft.EntityFrameworkCore.Cosmos
             = typeof(string).GetRuntimeMethod(nameof(string.IndexOf), new[] { typeof(char), typeof(int) });
 
         private readonly ISqlExpressionFactory _sqlExpressionFactory;
+        private readonly ITypeMappingSource _typeMappingSource;
 
         /// <summary>
         /// Initializes a new instance of <see cref="CosmosStringMethodCallTranslator" />.
         /// </summary>
         /// <param name="sqlExpressionFactory">The sql expression factory.</param>
-        public CosmosStringMethodCallTranslator(ISqlExpressionFactory sqlExpressionFactory)
+        /// <param name="typeMappingSource">The type mapping source.</param>
+        public CosmosStringMethodCallTranslator(
+            ISqlExpressionFactory sqlExpressionFactory, ITypeMappingSource typeMappingSource)
         {
-            _sqlExpressionFactory = sqlExpressionFactory;
+            _sqlExpressionFactory = sqlExpressionFactory ?? throw new ArgumentNullException(nameof(sqlExpressionFactory));
+            _typeMappingSource = typeMappingSource ?? throw new ArgumentNullException(nameof(typeMappingSource));
         }
 
         /// <inheritdoc />
@@ -122,9 +127,7 @@ namespace Microsoft.EntityFrameworkCore.Cosmos
             string function, Type returnType, params SqlExpression[] arguments)
         {
             return _sqlExpressionFactory.Function(
-                function,
-                arguments,
-                returnType);
+                function, arguments, returnType, _typeMappingSource.FindMapping(returnType));
         }
     }
 
